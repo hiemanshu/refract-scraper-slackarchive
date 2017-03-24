@@ -1,17 +1,20 @@
 const request = require('request-promise')
+const Joi = require('joi')
 
 const teamsApiPath = "http://api.slackarchive.io/v1/team"
 
 let validateConfig = (config) => {
-  if (config == undefined) {
-    throw "Undefined Config"
-  }
-  if (!("teamName" in config)) {
-    throw "Team Name not defined in config"
-  }
-  if (!("channels" in config)) {
-    throw "Channels not defined in config"
-  }
+  const schema = Joi.object().keys({
+    teamName: Joi.string().required(),
+    channels: Joi.array().items(Joi.string().regex(/#.+/)).required()
+  })
+
+  const result = Joi.validate(config, schema)
+
+  if (result.error === null)
+    return
+
+  throw result.error
 }
 
 let getTeamId = (config) => {
