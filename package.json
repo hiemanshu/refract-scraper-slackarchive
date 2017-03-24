@@ -11,6 +11,7 @@
   "author": "Hiemanshu Sharma",
   "license": "MIT",
   "dependencies": {
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
   }
 }
