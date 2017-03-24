@@ -1,3 +1,2 @@
-export default function scrape(config, videoModel) {
-
+module.exports = (config, videoModel) => {
 }
