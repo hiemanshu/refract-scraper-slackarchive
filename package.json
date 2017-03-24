@@ -1,0 +1,16 @@
+{
+  "name": "refract-scraper-slackarchive",
+  "version": "0.0.1",
+  "description": "Refract Scraper for SlackArchive",
+  "main": "index.js",
+  "keywords": [
+    "refract",
+    "scraper",
+    "slackarchive"
+  ],
+  "author": "Hiemanshu Sharma",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.81.0"
+  }
+}
