@@ -7,7 +7,7 @@ const teamsApiPath = "http://api.slackarchive.io/v1/team"
 
 const urlMatchRegex = /((www\.)?youtube\.com\/watch\?v=.{11}|(www\.)?youtu\.be\/.{11})/i
 
-let validateConfig = (config) => {
+const validateConfig = (config) => {
   const schema = Joi.object().keys({
     teamName: Joi.string().required(),
     channels: Joi.array().required()
@@ -21,7 +21,7 @@ let validateConfig = (config) => {
   throw result.error
 }
 
-let getTeamId = (config) => {
+const getTeamId = (config) => {
   const options = {
     method: "GET",
     uri: teamsApiPath,
@@ -43,7 +43,7 @@ let getTeamId = (config) => {
   })
 }
 
-let getChannels = (teamId, config) => {
+const getChannels = (teamId, config) => {
   const options = {
     method: "GET",
     uri: channelsApiPath,
@@ -68,7 +68,7 @@ let getChannels = (teamId, config) => {
   })
 }
 
-let parseMessages = (messages) => {
+const parseMessages = (messages) => {
   let videoUrls = new Array
 
   messages.messages.forEach((message) => {
@@ -81,10 +81,26 @@ let parseMessages = (messages) => {
     }
   })
 
-  return videoUrls
+  const lastMessage = messages.messages.pop()
+  const timestamp = lastMessage.ts
+
+  return {videos: videoUrls, timestamp: timestamp}
 }
 
-let getMessagesForChannel = (channelId, timestamp) => {
+const getAndParseMessagesForChannel = (channelId, timestamp) => {
+  getMessagesForChannel(channelId, timestamp)
+    .then((messages) => {
+      const {videos, timestamp} = parseMessages(messages)
+      console.log(videos)
+      console.log(timestamp)
+
+      if (timestamp !== undefined) {
+        getAndParseMessagesForChannel(channelId, timestamp)
+      }
+    })
+}
+
+const getMessagesForChannel = (channelId, timestamp) => {
   const options = {
     method: "GET",
     uri: messagesApiPath,
@@ -103,12 +119,15 @@ let getMessagesForChannel = (channelId, timestamp) => {
   })
 }
 
-let getMessages = (channelIds) => {
+const getMessages = (channelIds) => {
   channelIds.forEach((channelId) => {
     getMessagesForChannel(channelId)
       .then((messages) => {
-        console.log(parseMessages(messages))
+        const {videos, timestamp} = parseMessages(messages)
+        console.log(videos)
+        getAndParseMessagesForChannel(channelId, timestamp)
       })
+
   })
 }
 
